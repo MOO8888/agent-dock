@@ -1,0 +1,10 @@
+import fs from 'node:fs';import path from 'node:path';import {createDock} from '../src/server.mjs';
+const directory=fs.mkdtempSync(path.resolve('artifacts/workflow-ui-'));
+const dock=createDock({directory,native:{stop(){}}});
+const p=dock.store.createProject({title:'工作流界面验证（测试）',goal:'只验证界面与消息路由，不调用任何 AI 客户端',team:[{memberId:'codex'},{memberId:'doubao_work'}]});
+dock.store.saveMember({id:'codex',quota:{remaining:68,total:100,unit:'测试单位'}});
+for(const [stage,title,assignee] of [['planning','明确需求与编写提示词','codex'],['execution','按提示词制作成果','doubao_work'],['review','核对成果与安排修正','codex'],['delivery','整理可交付文件','codex']])dock.store.createTask(p.id,{stage,title,assignee,description:'界面验证任务，未调用模型。',acceptance:'分组和折叠行为正确。'});
+dock.store.postCoordinator(p.id,{text:'这是独立界面测试。实际项目中，我会先与你明确目标，写好具体提示词与验收标准，再安排执行成员工作。'});
+await new Promise(resolve=>dock.server.listen(0,'127.0.0.1',resolve));
+const base=`http://127.0.0.1:${dock.server.address().port}`;fs.writeFileSync('artifacts/workflow-ui-latest.json',JSON.stringify({base,projectId:p.id,directory,pid:process.pid}));console.log(base);
+setTimeout(()=>dock.close().then(()=>process.exit(0)),600000);
