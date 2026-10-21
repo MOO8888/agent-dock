@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>共作 · AgentDock</title><link rel="icon" href="/logo.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="project-directory">
+      <a class="brand" href="/" aria-label="共作工作台"><img src="/logo.svg" alt=""><span>共作<small>AGENTDOCK</small></span><span class="version">0.1</span></a>
+      <button class="new-project" id="new-project"><span>＋</span> 新建项目</button>
+      <div class="directory-group" id="directory-projects">
+      <div class="sidebar-label">你的项目 <span id="project-count">0</span></div>
+      <nav id="project-list" aria-label="项目"></nav>
+      <button class="trash-nav" id="project-trash" aria-label="项目回收站" title="项目回收站"><span aria-hidden="true">♲</span><span>回收站</span><small id="trash-count">0</small></button>
+      </div>
+      <div class="workspace-resizer horizontal-resizer" id="directory-resizer" data-resize="directory" role="separator" aria-orientation="horizontal" aria-label="调整目录与团队分区" aria-controls="directory-projects directory-team" tabindex="0" title="上下拖动调整项目目录与团队，双击恢复默认"></div>
+      <div class="directory-team" id="directory-team">
+      <div class="sidebar-label team-label">团队 <button id="edit-team" title="配置团队">设置</button></div>
+      <div id="member-list"></div>
+      </div>
+      <div class="sidebar-bottom"><span class="local-dot"></span><div>在你的电脑上工作<small>官方客户端 · 本地成果</small></div><button id="integration" title="连接 Codex">↗</button></div>
+    </aside>
+    <div class="workspace-resizer" id="sidebar-resizer" data-resize="sidebar" role="separator" aria-orientation="vertical" aria-label="调整目录区宽度" aria-controls="project-directory" tabindex="0" title="左右拖动调整目录区宽度，双击恢复默认"></div>
+    <main>
+      <header class="topbar"><div class="breadcrumb">工作空间 <span>/</span> <b id="project-breadcrumb">开始一个项目</b></div><div class="top-actions"><span id="connection" class="connection">本地已连接</span><button class="icon-button" id="open-integration" title="连接统筹者">连接 Codex</button></div></header>
+      <aside id="problem-banner" class="problem-banner hidden" role="status" aria-live="polite"><div><b></b><span></span></div><button class="secondary">查看解决方案</button></aside>
+      <section id="welcome" class="welcome">
+        <span class="eyebrow">你的本地 AI 工作空间</span><h1>一个目标。<br>一起完成。</h1><p>让不同 AI 各展所长，在这里协作。<br>你只需要说出想完成的事。</p>
+        <button id="welcome-new" class="primary">开始一个项目 <span>↗</span></button>
+        <div class="starter-grid">
+          <button class="starter" data-template="game"><span class="starter-icon">⌘</span><b>开发一个小游戏</b><small>构思 → 代码 → 试玩与返工</small><span>↗</span></button>
+          <button class="starter" data-template="report"><span class="starter-icon">▤</span><b>完成一份研究报告</b><small>资料 → 整理 → 核实与交付</small><span>↗</span></button>
+          <button class="starter" data-template="custom"><span class="starter-icon">✳</span><b>从你的想法开始</b><small>成员和角色，由你定义</small><span>↗</span></button>
+        </div>
+        <div class="honest-note"><span>◌</span> 连接官方客户端，项目记录与成果保存在本地。</div>
+      </section>
+      <section id="project-view" class="project-view hidden">
+        <div class="project-overview" id="project-overview">
+        <div class="project-heading"><div><span class="eyebrow" id="project-status">准备中</span><h1 id="project-title"></h1><p id="project-goal"></p></div><div class="project-buttons"><button id="project-actions" class="icon-button" aria-label="项目操作" title="重命名、编辑分工或删除项目">•••</button><button id="export-project" class="secondary">导出记录</button><button id="run-project" class="primary">启动项目 <span>▷</span></button></div></div>
+        <div class="workspace-tabs"><div role="tablist"><button class="tab active" data-tab="chat" role="tab">群聊</button><button class="tab" data-tab="tasks" role="tab">任务 <span id="task-count">0</span></button><button class="tab" data-tab="artifacts" role="tab">成果 <span id="artifact-count">0</span></button><button class="tab" data-tab="settings" role="tab">项目设置</button></div><span id="team-caption"></span><button id="toggle-monitor" class="secondary" aria-expanded="false" aria-controls="operation-monitor">监视</button></div>
+        </div>
+        <div class="workspace-resizer horizontal-resizer" id="overview-resizer" data-resize="overview" role="separator" aria-orientation="horizontal" aria-label="调整项目顶部与工作区" aria-controls="project-overview project-workspace" tabindex="0" title="上下拖动调整项目顶部与工作区，双击恢复默认"></div>
+        <div class="workspace-body" id="project-workspace">
+          <div class="conversation">
+            <div id="chat-pane" class="pane"><div id="workflow-route" class="workflow-route" aria-label="协作流程"></div><div class="messages" id="messages" tabindex="0" aria-label="项目群聊记录"></div><div id="execution-activity" class="execution-activity hidden" role="status" aria-live="polite" aria-atomic="true"></div><div class="workspace-resizer horizontal-resizer" id="composer-resizer" data-resize="composer" role="separator" aria-orientation="horizontal" aria-label="调整群聊与输入区" aria-controls="messages composer" tabindex="0" title="上下拖动调整输入区高度，双击恢复默认"></div><form id="composer" class="composer"><div id="attachment-drafts" class="attachment-drafts" aria-live="polite"></div><textarea id="message-input" placeholder="给团队一个目标，或随时补充你的想法…" rows="2" aria-label="群聊消息"></textarea><div class="message-mode"><label>发送方式<select id="message-mode" aria-label="发送方式"><option value="new">新目标 · 新开会话</option><option value="continue">补充本轮 · 保留上下文</option></select></label></div><div id="agent-controls" class="agent-controls" aria-label="成员模型设置"></div><input id="file-upload" type="file" multiple hidden><div class="composer-footer"><button type="button" id="attach-files" class="attach-button" aria-label="上传附件" title="上传、拖入或粘贴文件；每条消息最多 20 个，单文件 100 MB">＋</button><span>↵ 发送 · Shift + ↵ 换行 <b id="coordinator-hint">等待 Codex 连接</b></span><button class="send" type="submit" aria-label="发送消息">↑</button></div></form></div>
+            <div id="tasks-pane" class="pane hidden"><div class="pane-heading"><div><h2>任务推进</h2><p>分工、交接与验收，都在这里。</p></div><button id="add-task" class="secondary">＋ 新任务</button></div><div id="task-board"></div></div>
+            <div id="artifacts-pane" class="pane hidden"><div class="pane-heading"><div><h2>项目成果</h2><p>查看团队交付的本地文件。</p></div></div><div class="workspace-path" id="workspace-path"></div><div id="artifact-list"></div></div>
+            <div id="settings-pane" class="pane hidden"><div class="pane-heading"><div><h2>项目设置</h2><p>按照你的习惯安排工作。</p></div></div><form id="settings-form" class="settings-form"><label>项目名称<input name="title" required maxlength="100"></label><label>项目目标<textarea name="goal" rows="5" required></textarea></label><label>自主程度<select name="freedom"><option value="autonomous">自主推进 · 重要缺口再提问</option><option value="creative">自由发挥 · 自行决定方案细节</option><option value="ask">先沟通方案 · 再推进执行</option></select></label><label>自动返工上限<input name="maxReworks" type="number" min="0" max="20"></label><label>本地操作桌面<select name="desktop" id="desktop-select"><option value="default">当前桌面 · 仅后台控件操作</option></select></label><p class="field-note">独立桌面为实验能力。客户端可能不支持后台输入或画面捕获；需要接管时会停止操作。</p><div class="settings-actions"><button class="primary" type="submit">保存设置</button><button class="secondary" type="button" id="edit-project-team">编辑项目分工</button><button class="secondary" type="button" id="create-desktop">创建实验桌面</button><button class="secondary" type="button" id="launch-desktop">在实验桌面启动应用</button></div></form></div>
+          </div>
+          <div class="workspace-resizer" id="monitor-resizer" data-resize="monitor" role="separator" aria-orientation="vertical" aria-label="调整监视区宽度" aria-controls="operation-monitor" tabindex="0" title="左右拖动调整监视区宽度，双击恢复默认"></div>
+          <aside class="monitor" id="operation-monitor">
+            <div class="workspace-resizer overlay-resizer" id="monitor-overlay-resizer" data-resize="monitor" role="separator" aria-orientation="vertical" aria-label="调整监视浮窗宽度" aria-controls="operation-monitor" tabindex="0" title="左右拖动调整监视浮窗宽度，双击恢复默认"></div>
+            <div class="monitor-heading"><span class="eyebrow">现场</span><span class="live-label"><i></i> 真实窗口</span></div><div class="monitor-title"><h2>操作预览</h2><button id="refresh-monitor" class="icon-button" title="刷新画面">↻</button></div><div class="monitor-select"><select id="monitor-member" aria-label="监视成员"></select><button id="bind-window" class="secondary">绑定窗口</button></div>
+            <div class="screen" id="screen"><div class="screen-empty"><span>▧</span><b>还没有操作画面</b><p>绑定官方客户端窗口，<br>查看真实文字和后台截图。</p></div></div>
+            <div class="workspace-resizer horizontal-resizer" id="preview-resizer" data-resize="preview" role="separator" aria-orientation="horizontal" aria-label="调整操作预览高度" aria-controls="screen" tabindex="0" title="上下拖动调整操作预览高度，双击恢复默认"></div>
+            <div id="monitor-notice" class="monitor-notice">操作组件不会移动你当前的鼠标。</div><div class="monitor-actions"><button class="secondary" id="inspect-text">查看控件</button><button class="secondary" id="take-over">暂停操作</button></div><button class="secondary enter-desktop hidden" id="enter-desktop">进入工作桌面 ↗</button><div class="progress-section"><div class="sidebar-label">工作流进度</div><div id="progress-summary"></div></div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <dialog id="dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="dialog-close" class="icon-button" aria-label="关闭">×</button></div><div id="dialog-body"></div></dialog>
+  <dialog id="problem-dialog" aria-labelledby="problem-title"><div class="dialog-header"><h2 id="problem-title">协作遇到问题</h2><button id="problem-close" class="icon-button" aria-label="暂时关闭问题提示">×</button></div><p class="dialog-note">原因和处理步骤会保留在顶部提示中；同一问题不会反复弹窗。</p><div id="problem-body"></div></dialog>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script type="module" src="/app.js"></script>
+</body></html>
+
+
+
