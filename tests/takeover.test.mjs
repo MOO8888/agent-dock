@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { createDock } from '../src/server.mjs';
+import { executeTool, definitions } from '../src/tools.mjs';
+
+test('human takeover is separate from AI tools, pauses observation and requires return before resuming', async t => {
+  let active = true;
+  const calls = [], native = { observations: new Map([['stale',{}]]), stop() {}, async call(action, args) { calls.push(action); if(action==='takeover') { assert.equal(dock.store.project(project.id).status,'paused'); return {pid:999}; } if(action==='takeover_status') return {active}; throw new Error('unexpected action'); } };
+  const dock = createDock({ directory: fs.mkdtempSync(path.join(os.tmpdir(),'agentdock-takeover-')), native });
+  await new Promise(resolve=>dock.server.listen(0,'127.0.0.1',resolve)); t.after(()=>dock.close());
+  const base=`http://127.0.0.1:${dock.server.address().port}`, home=await fetch(base), cookie=home.headers.get('set-cookie').split(';')[0];
+  const project=dock.store.createProject({title:'接管验证',goal:'处理首次客户端确认'});
+  dock.store.updateProject(project.id,{desktop:'AgentDock_fixture'}); dock.store.runProject(project.id);
+  const endpoint=`${base}/api/projects/${project.id}/takeover`;
+  const send=headers=>fetch(endpoint,{method:'POST',headers,body:'{}'});
+  assert.equal((await send({authorization:`Bearer ${dock.token}`})).status,403);
+  assert.equal((await send({cookie})).status,403); assert.deepEqual(calls,[]);
+  assert.equal((await send({cookie,'sec-fetch-site':'same-origin'})).status,200);
+  assert.equal(native.observations.size,0); assert.equal(dock.store.project(project.id).takeover.active,true);
+  assert.throws(()=>dock.store.runProject(project.id),{code:'human_takeover_active'});
+  await assert.rejects(executeTool('dock_observe',{projectId:project.id,memberId:'trae'},dock.store,native),{code:'human_takeover_active'});
+  assert.ok(!definitions().some(tool=>/takeover|switch_desktop/.test(tool.name)));
+  active=false;
+  const state=await executeTool('dock_state',{},dock.store,native);
+  assert.equal(state.projects[0].takeover.active,false); assert.equal(state.projects[0].status,'paused');
+  assert.equal(dock.store.runProject(project.id).status,'running');
+});
