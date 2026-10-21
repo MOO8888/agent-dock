@@ -1,0 +1,22 @@
+name: Windows checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Automated checks (no AI accounts)
+        run: npm test
+      - name: Build Windows components
+        run: npm run build:native
+      - name: Export clean source
+        run: npm run pack:source
