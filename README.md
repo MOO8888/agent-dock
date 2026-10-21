@@ -55,6 +55,8 @@
 
 ## 快速开始
 
+第一次运行？请看 **[Windows 本地部署教程](docs/DEPLOYMENT.md)**，包含环境安装、客户端准备、首次任务和常见问题。
+
 要求：Windows x64、Node.js 22+、Windows .NET Framework 4.x 编译器。工作台无 npm 运行依赖；自动统筹另需本机可用且已登录的官方 Codex 运行时。
 
 1. 下载并解压源码，放在自己的可写目录。
